@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Login | FRAME CRAFT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      background: #fbfbfb;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .auth-page-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .customer-auth-box {
+      background: #ffffff;
+      width: 100%;
+      max-width: 480px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-grey-200);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+    .customer-auth-header {
+      text-align: center;
+      padding: 32px 30px 20px;
+      border-bottom: 1px solid var(--color-grey-100);
+    }
+    .customer-auth-header .logo-mark {
+      margin: 0 auto 12px;
+    }
+    .customer-auth-header h1 {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--color-black);
+    }
+    .customer-auth-header p {
+      color: var(--color-grey-500);
+      font-size: 0.88rem;
+      margin-top: 4px;
+    }
+    .auth-mode-switch {
+      display: flex;
+      background: var(--color-grey-100);
+      padding: 4px;
+      margin: 20px 30px 0;
+      border-radius: var(--radius-md);
+      gap: 4px;
+    }
+    .auth-tab-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 10px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--color-grey-700);
+      transition: var(--transition);
+    }
+    .auth-tab-btn.active {
+      background: #ffffff;
+      color: var(--color-black);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .customer-auth-body {
+      padding: 28px 30px 32px;
+    }
+    .auth-feedback-banner {
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 18px;
+      display: none;
+    }
+    .auth-feedback-banner.error {
+      display: block;
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+    }
+    .auth-feedback-banner.success {
+      display: block;
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #86efac;
+    }
+    .customer-auth-footer {
+      background: var(--color-grey-50);
+      border-top: 1px solid var(--color-grey-200);
+      padding: 18px 30px;
+      text-align: center;
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .customer-auth-footer a {
+      font-weight: 700;
+      color: var(--color-black);
+    }
+    .customer-auth-footer a:hover {
+      text-decoration: underline;
+    }
+    .demo-account-hint {
+      margin-top: 14px;
+      background: var(--color-yellow-light);
+      border: 1px solid rgba(255, 210, 0, 0.5);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      color: #713f12;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <aside class="top-bar">
+    <div class="container top-bar-content">
+      <div class="top-bar-left">
+        <span class="delivery-badge"><i class="fa-solid fa-truck-fast"></i></span>
+        <span class="announcement-text">Customer Portal • Free Nationwide Delivery</span>
+      </div>
+      <div class="top-bar-right">
+        <a href="/" class="phone-link">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Return to Store</span>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <main class="auth-page-container">
+    <div class="customer-auth-box">
+      <div class="customer-auth-header">
+        <div class="logo-mark">
+          <i class="fa-solid fa-crop-simple"></i>
+        </div>
+        <h1>Customer Account</h1>
+        <p>Access your personalized order history & profile</p>
+      </div>
+
+      <!-- Mode Switch: Sign In vs Create Account -->
+      <div class="auth-mode-switch">
+        <button type="button" class="auth-tab-btn active" id="tab-signin" onclick="setAuthMode('login')">
+          Sign In
+        </button>
+        <button type="button" class="auth-tab-btn" id="tab-register" onclick="setAuthMode('register')">
+          Create Account
+        </button>
+      </div>
+
+      <div class="customer-auth-body">
+        <div id="auth-feedback" class="auth-feedback-banner"></div>
+
+        <!-- Form 1: Customer Login -->
+        <form id="customer-login-form" onsubmit="event.preventDefault(); handleCustomerLogin();">
+          <div class="form-group">
+            <label for="cust-email">Email or Phone Number *</label>
+            <div class="input-with-icon">
+              <i class="fa-regular fa-envelope"></i>
+              <input type="text" id="cust-email" value="talha@example.com" required placeholder="e.g. talha@example.com">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="label-row">
+              <label for="cust-password">Password *</label>
+            </div>
+            <div class="input-with-icon">
+              <i class="fa-solid fa-lock"></i>
+              <input type="password" id="cust-password" value="password123" required placeholder="Enter your password">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-yellow-block" id="btn-login-submit">
+            <span>Sign In to Customer Account</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+
+          <div class="demo-account-hint">
+            <i class="fa-solid fa-circle-info"></i> Demo Customer: <code>talha@example.com</code> / <code>password123</code>
+          </div>
+        </form>
+
+        <!-- Form 2: Customer Register -->
+        <form id="customer-register-form" style="display: none;" onsubmit="event.preventDefault(); handleCustomerRegister();">
+          <div class="form-group">
+            <label for="reg-name">Full Name *</label>
+            <div class="input-with-icon">
+              <i class="fa-regular fa-user"></i>
+              <input type="text" id="reg-name" required placeholder="e.g. Muhammad Talha">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="reg-email">Email Address *</label>
+            <div class="input-with-icon">
+              <i class="fa-regular fa-envelope"></i>
+              <input type="email" id="reg-email" required placeholder="e.g. talha@example.com">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="reg-phone">Phone / WhatsApp *</label>
+              <input type="tel" id="reg-phone" required placeholder="0300 1234567">
+            </div>
+            <div class="form-group">
+              <label for="reg-city">City *</label>
+              <input type="text" id="reg-city" required placeholder="e.g. Lahore">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="reg-password">Create Password *</label>
+            <div class="input-with-icon">
+              <i class="fa-solid fa-key"></i>
+              <input type="password" id="reg-password" required minlength="4" placeholder="Minimum 4 characters">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-yellow-block" id="btn-register-submit">
+            <span>Create Customer Account</span>
+            <i class="fa-solid fa-user-plus"></i>
+          </button>
+        </form>
+      </div>
+
+      <div class="customer-auth-footer">
+        <a href="/"><i class="fa-solid fa-house"></i> Back to Store</a>
+        <a href="/admin-login" style="color: #666;"><i class="fa-solid fa-shield-halved"></i> Admin Portal</a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function setAuthMode(mode) {
+      const loginForm = document.getElementById('customer-login-form');
+      const registerForm = document.getElementById('customer-register-form');
+      const tabLogin = document.getElementById('tab-signin');
+      const tabRegister = document.getElementById('tab-register');
+      const feedback = document.getElementById('auth-feedback');
+      feedback.style.display = 'none';
+
+      if (mode === 'register') {
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
+      } else {
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+      }
+    }
+
+    function showFeedback(msg, type) {
+      const box = document.getElementById('auth-feedback');
+      box.textContent = msg;
+      box.className = `auth-feedback-banner ${type}`;
+      box.style.display = 'block';
+    }
+
+    async function handleCustomerLogin() {
+      const email = document.getElementById('cust-email').value.trim();
+      const password = document.getElementById('cust-password').value.trim();
+
+      if (!email || !password) {
+        showFeedback('Please provide both email and password', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth/customer-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          showFeedback(data.message || 'Login failed', 'error');
+          return;
+        }
+
+        // Store customer token and user info
+        localStorage.setItem('customer_token', data.token);
+        localStorage.setItem('customer_info', JSON.stringify(data.customer));
+
+        showFeedback('Login successful! Redirecting to your account...', 'success');
+        setTimeout(() => {
+          window.location.href = data.redirect || '/account';
+        }, 500);
+
+      } catch (err) {
+        showFeedback('Network error: ' + err.message, 'error');
+      }
+    }
+
+    async function handleCustomerRegister() {
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const phone = document.getElementById('reg-phone').value.trim();
+      const city = document.getElementById('reg-city').value.trim();
+      const password = document.getElementById('reg-password').value.trim();
+
+      try {
+        const res = await fetch('/api/auth/customer-register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, phone, city, password })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          showFeedback(data.message || 'Registration failed', 'error');
+          return;
+        }
+
+        localStorage.setItem('customer_token', data.token);
+        localStorage.setItem('customer_info', JSON.stringify(data.customer));
+
+        showFeedback('Account created successfully! Redirecting...', 'success');
+        setTimeout(() => {
+          window.location.href = data.redirect || '/account';
+        }, 600);
+
+      } catch (err) {
+        showFeedback('Error: ' + err.message, 'error');
+      }
+    }
+  </script>
+</body>
+</html>

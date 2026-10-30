@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal Login | FRAME CRAFT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body style="background: radial-gradient(circle at top right, #1e293b, #0f172a); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
+
+  <div class="auth-card" style="box-shadow: 0 25px 60px rgba(0,0,0,0.5);">
+    <div class="auth-card-header">
+      <div class="brand-badge" style="background: #ffd200; color: #111;">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <h2 style="font-size: 1.6rem; color: #0f172a;">FRAME CRAFT</h2>
+      <span class="auth-subtitle">Store Administrator Portal</span>
+    </div>
+
+    <div class="auth-database-note" style="background: #f8fafc; border-color: #cbd5e1;">
+      <i class="fa-solid fa-lock" style="color: #ca8a04;"></i>
+      <span>Protected Admin Route • Synced with <strong>data.json</strong></span>
+    </div>
+
+    <div id="admin-login-feedback" class="auth-feedback-box"></div>
+
+    <form id="admin-login-form" onsubmit="event.preventDefault(); handleAdminPortalLogin();">
+      <div class="form-group">
+        <label for="admin-user" style="font-weight: 700;">Admin Username</label>
+        <div class="input-icon-wrap" style="position: relative;">
+          <i class="fa-regular fa-user" style="position: absolute; left: 14px; top: 12px; color: #64748b;"></i>
+          <input type="text" id="admin-user" value="admin" required placeholder="Enter admin username" style="padding-left: 40px; width: 100%;">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="admin-pass" style="font-weight: 700;">Admin Password</label>
+        <div class="input-icon-wrap" style="position: relative;">
+          <i class="fa-solid fa-key" style="position: absolute; left: 14px; top: 12px; color: #64748b;"></i>
+          <input type="password" id="admin-pass" value="admin123" required placeholder="Enter admin password" style="padding-left: 40px; width: 100%;">
+        </div>
+        <small style="display: block; margin-top: 6px; font-size: 0.78rem; color: #64748b;">
+          Default admin credentials: <code>admin</code> / <code>admin123</code>
+        </small>
+      </div>
+
+      <button type="submit" class="btn btn-yellow-block" id="btn-admin-submit" style="margin-top: 10px; font-weight: 800; padding: 14px;">
+        <span>Access Admin Dashboard</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </form>
+
+    <div class="auth-card-footer" style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between;">
+      <a href="/" class="back-to-store" style="font-weight: 700; font-size: 0.85rem;"><i class="fa-solid fa-house"></i> Storefront</a>
+      <a href="/customer-login" style="color: #64748b; font-size: 0.85rem; font-weight: 600;"><i class="fa-solid fa-user"></i> Customer Sign In</a>
+    </div>
+  </div>
+
+  <script>
+    async function handleAdminPortalLogin() {
+      const username = document.getElementById('admin-user').value.trim();
+      const password = document.getElementById('admin-pass').value.trim();
+      const feedback = document.getElementById('admin-login-feedback');
+      const submitBtn = document.getElementById('btn-admin-submit');
+
+      if (!username || !password) {
+        feedback.textContent = 'Please enter both username and password';
+        feedback.className = 'auth-feedback-box error';
+        feedback.style.display = 'block';
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>Verifying Admin Rights...</span>';
+
+      try {
+        const res = await fetch('/api/auth/admin-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          feedback.textContent = data.message || 'Invalid admin credentials';
+          feedback.className = 'auth-feedback-box error';
+          feedback.style.display = 'block';
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Access Admin Dashboard</span> <i class="fa-solid fa-arrow-right"></i>';
+          return;
+        }
+
+        // Store Admin token in sessionStorage & localStorage
+        sessionStorage.setItem('admin_token', data.token);
+        localStorage.setItem('admin_token', data.token);
+
+        feedback.textContent = 'Admin authenticated! Redirecting to Dashboard...';
+        feedback.className = 'auth-feedback-box success';
+        feedback.style.display = 'block';
+
+        setTimeout(() => {
+          window.location.href = data.redirect || '/admin-dashboard';
+        }, 600);
+
+      } catch (err) {
+        feedback.textContent = 'Connection error: ' + err.message;
+        feedback.className = 'auth-feedback-box error';
+        feedback.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Access Admin Dashboard</span> <i class="fa-solid fa-arrow-right"></i>';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | FRAME CRAFT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- ADMIN AUTHENTICATION OVERLAY / SCREEN (Shown if not logged in) -->
+  <div id="admin-auth-screen" class="auth-fullscreen-overlay">
+    <div class="auth-card">
+      <div class="auth-card-header">
+        <div class="brand-badge">
+          <i class="fa-solid fa-crop-simple"></i>
+        </div>
+        <h2>FRAME CRAFT</h2>
+        <span class="auth-subtitle">Store Administrator Portal</span>
+      </div>
+
+      <div class="auth-database-note">
+        <i class="fa-solid fa-database"></i>
+        <span>Protected route synced with <strong>data.json</strong></span>
+      </div>
+
+      <form id="admin-login-form" onsubmit="event.preventDefault(); window.adminApp.handleAdminLogin();">
+        <div class="form-group">
+          <label for="admin-user-input">Admin Username</label>
+          <div class="input-icon-wrap">
+            <i class="fa-regular fa-user"></i>
+            <input type="text" id="admin-user-input" value="admin" required placeholder="Enter admin username">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="admin-pass-input">Admin Password</label>
+          <div class="input-icon-wrap">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="admin-pass-input" value="admin123" required placeholder="Enter admin password">
+            <button type="button" class="btn-toggle-pass" onclick="window.adminApp.togglePass('admin-pass-input')">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+          <small class="hint-text">Default credentials: <code>admin</code> / <code>admin123</code></small>
+        </div>
+
+        <div id="admin-auth-feedback" class="auth-feedback-box"></div>
+
+        <button type="submit" class="btn btn-yellow-block" id="admin-login-btn">
+          <span>Authenticate & Access Dashboard</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <div class="auth-card-footer">
+        <a href="/" class="back-to-store"><i class="fa-solid fa-arrow-left"></i> Return to Live Storefront</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN ADMIN DASHBOARD LAYOUT -->
+  <div id="admin-dashboard-layout" class="admin-layout" style="display: none;">
+
+    <!-- Admin Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <a href="/" target="_blank" class="sidebar-brand">
+          <div class="brand-icon"><i class="fa-solid fa-crop-simple"></i></div>
+          <div class="brand-info">
+            <span class="brand-title">FRAME CRAFT</span>
+            <span class="brand-role">Admin Control</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="sidebar-user-card">
+        <div class="user-avatar"><i class="fa-solid fa-user-shield"></i></div>
+        <div class="user-details">
+          <strong id="admin-display-name">Store Admin</strong>
+          <span class="online-indicator"><span class="green-dot"></span> Live in data.json</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button type="button" class="nav-tab-btn active" data-tab="tab-overview">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Overview</span>
+        </button>
+        <button type="button" class="nav-tab-btn" data-tab="tab-products">
+          <i class="fa-solid fa-boxes-stacked"></i>
+          <span>Product Management</span>
+          <span class="nav-badge" id="sidebar-product-count">0</span>
+        </button>
+        <button type="button" class="nav-tab-btn" data-tab="tab-content">
+          <i class="fa-solid fa-pen-ruler"></i>
+          <span>Content Management</span>
+        </button>
+        <button type="button" class="nav-tab-btn" data-tab="tab-orders">
+          <i class="fa-solid fa-receipt"></i>
+          <span>Customer Orders</span>
+          <span class="nav-badge order-badge" id="sidebar-order-count">0</span>
+        </button>
+        <button type="button" class="nav-tab-btn" data-tab="tab-security">
+          <i class="fa-solid fa-key"></i>
+          <span>Admin Credentials</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="/" target="_blank" class="btn-store-preview">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <span>View Live Store</span>
+        </a>
+        <button type="button" class="btn-sidebar-logout" onclick="window.adminApp.handleLogout()">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Log Out</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Admin Main Content Area -->
+    <main class="admin-main">
+      
+      <!-- Top Bar Header -->
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <button type="button" class="btn-mobile-sidebar" onclick="window.adminApp.toggleMobileSidebar()">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="topbar-breadcrumbs">
+            <span class="crumb-parent">Control Center</span>
+            <i class="fa-solid fa-chevron-right crumb-sep"></i>
+            <span class="crumb-current" id="active-tab-title">Dashboard Overview</span>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="sync-status-pill">
+            <i class="fa-solid fa-file-code"></i>
+            <span>data.json auto-sync: <strong>ACTIVE</strong></span>
+          </div>
+          <button type="button" class="btn btn-yellow-sm" onclick="window.adminApp.refreshData()">
+            <i class="fa-solid fa-arrows-rotate"></i> Reload Data
+          </button>
+        </div>
+      </header>
+
+      <!-- Tab 1: OVERVIEW -->
+      <section id="tab-overview" class="tab-pane active">
+        <div class="tab-header-banner">
+          <div class="banner-text">
+            <h2>Welcome to Frame Craft Management</h2>
+            <p>Every edit made in this panel is immediately written to <code>data.json</code> using Node.js fs module and reflected instantly on the customer storefront.</p>
+          </div>
+          <div class="banner-action">
+            <button type="button" class="btn btn-black-solid" onclick="window.adminApp.openAddProductModal()">
+              <i class="fa-solid fa-plus"></i> Add New Product
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Metric Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon yellow"><i class="fa-solid fa-shapes"></i></div>
+            <div class="stat-data">
+              <span class="stat-label">Total Products</span>
+              <strong class="stat-number" id="stat-total-products">0</strong>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon black"><i class="fa-solid fa-bag-shopping"></i></div>
+            <div class="stat-data">
+              <span class="stat-label">Total Orders</span>
+              <strong class="stat-number" id="stat-total-orders">0</strong>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon yellow"><i class="fa-solid fa-tags"></i></div>
+            <div class="stat-data">
+              <span class="stat-label">Categories Active</span>
+              <strong class="stat-number" id="stat-total-categories">6</strong>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon black"><i class="fa-solid fa-phone"></i></div>
+            <div class="stat-data">
+              <span class="stat-label">Store Hotline</span>
+              <strong class="stat-number-sm" id="stat-store-phone">+92 300 1234567</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Navigation Cards -->
+        <div class="overview-grid">
+          <div class="overview-box">
+            <div class="box-head">
+              <h3><i class="fa-solid fa-pen-nib"></i> Quick Content Highlights</h3>
+              <button type="button" class="btn-text-link" onclick="window.adminApp.switchTab('tab-content')">Edit Content &rarr;</button>
+            </div>
+            <div class="box-content">
+              <div class="info-row">
+                <span class="info-label">Top Bar Text:</span>
+                <span class="info-value" id="overview-topbar-text">Free Delivery on All Frames</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Hero Title:</span>
+                <span class="info-value" id="overview-hero-title">CUSTOMIZED FRAMES FOR YOU</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Admin User:</span>
+                <span class="info-value" id="overview-admin-user">admin</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Store Email:</span>
+                <span class="info-value" id="overview-store-email">support@framecraft.com</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="overview-box">
+            <div class="box-head">
+              <h3><i class="fa-solid fa-sparkles"></i> Featured Products Preview</h3>
+              <button type="button" class="btn-text-link" onclick="window.adminApp.switchTab('tab-products')">Manage All &rarr;</button>
+            </div>
+            <div class="box-content" id="overview-products-preview">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 2: PRODUCT MANAGEMENT -->
+      <section id="tab-products" class="tab-pane">
+        <div class="pane-action-bar">
+          <div class="bar-title">
+            <h2>Product Management</h2>
+            <p>Add new products, edit titles, adjust original and current prices, update discount badges, and manage product images.</p>
+          </div>
+          <div class="bar-buttons">
+            <button type="button" class="btn btn-yellow" onclick="window.adminApp.openAddProductModal()">
+              <i class="fa-solid fa-plus"></i> Add New Product
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="products-toolbar">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="admin-product-search" placeholder="Search by title, category, or ID..." oninput="window.adminApp.filterAdminProducts()">
+          </div>
+          <div class="category-filter">
+            <select id="admin-category-filter" onchange="window.adminApp.filterAdminProducts()">
+              <option value="all">All Categories</option>
+              <option value="birthday">Birthday Frame</option>
+              <option value="led-mirror">Led Magic Mirror Frames</option>
+              <option value="anniversary">Anniversary Frames</option>
+              <option value="wedding">Wedding Frame</option>
+              <option value="top-selling">Top Selling</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Products Table Container -->
+        <div class="table-card">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Title & ID</th>
+                <th>Category</th>
+                <th>Badge</th>
+                <th>Original Price</th>
+                <th>Current Price</th>
+                <th>Stock</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-products-table-body">
+              <!-- Rendered dynamically via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Tab 3: CONTENT MANAGEMENT (EDIT EVERYTHING ON WEBSITE) -->
+      <section id="tab-content" class="tab-pane">
+        <div class="pane-action-bar">
+          <div class="bar-title">
+            <h2>Content Management</h2>
+            <p>Edit every text section on the frontend: Top Announcement Bar, Phone Hotline, Hero Title, Subtitle, Categories, and Footer details.</p>
+          </div>
+          <div class="bar-buttons">
+            <button type="button" class="btn btn-yellow" onclick="window.adminApp.saveAllContent()">
+              <i class="fa-solid fa-floppy-disk"></i> Save All Content to data.json
+            </button>
+          </div>
+        </div>
+
+        <div class="content-forms-grid">
+          
+          <!-- 1. Top Bar & Contact Hotline Form -->
+          <div class="content-card">
+            <div class="card-header">
+              <div class="header-icon"><i class="fa-solid fa-bullhorn"></i></div>
+              <h3>1. Top Announcement Bar</h3>
+            </div>
+            <div class="card-body">
+              <form id="form-topbar" onsubmit="event.preventDefault(); window.adminApp.saveSection('topBar');">
+                <div class="form-group">
+                  <label for="edit-topbar-text">Announcement Text (Shown in Black Top Bar)</label>
+                  <input type="text" id="edit-topbar-text" required placeholder="e.g. Free Delivery on All Frames">
+                </div>
+                <div class="form-group">
+                  <label for="edit-topbar-phone">Top Bar Phone Number (Click-to-call)</label>
+                  <input type="text" id="edit-topbar-phone" required placeholder="e.g. +92 300 1234567">
+                </div>
+                <button type="submit" class="btn btn-yellow-sm">
+                  <i class="fa-solid fa-floppy-disk"></i> Save Top Bar
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- 2. Header & Branding Form -->
+          <div class="content-card">
+            <div class="card-header">
+              <div class="header-icon"><i class="fa-solid fa-crown"></i></div>
+              <h3>2. Header & Brand Title</h3>
+            </div>
+            <div class="card-body">
+              <form id="form-header" onsubmit="event.preventDefault(); window.adminApp.saveSection('header');">
+                <div class="form-group">
+                  <label for="edit-brand-name">Brand Name (Logo Text)</label>
+                  <input type="text" id="edit-brand-name" required placeholder="e.g. FRAME CRAFT">
+                </div>
+                <div class="form-group">
+                  <label for="edit-brand-tagline">Tagline / Subtext</label>
+                  <input type="text" id="edit-brand-tagline" required placeholder="e.g. CUSTOMIZED FRAMES">
+                </div>
+                <button type="submit" class="btn btn-yellow-sm">
+                  <i class="fa-solid fa-floppy-disk"></i> Save Brand Details
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- 3. Hero Section Form -->
+          <div class="content-card full-width-card">
+            <div class="card-header">
+              <div class="header-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+              <h3>3. Hero Banner Section</h3>
+            </div>
+            <div class="card-body">
+              <form id="form-hero" onsubmit="event.preventDefault(); window.adminApp.saveSection('hero');">
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label for="edit-hero-badge">Hero Top Badge Text</label>
+                    <input type="text" id="edit-hero-badge" placeholder="e.g. BESTSELLER 2026">
+                  </div>
+                  <div class="form-group">
+                    <label for="edit-hero-title">Hero Main Heading (Large Bold Text)</label>
+                    <input type="text" id="edit-hero-title" required placeholder="e.g. CUSTOMIZED FRAMES FOR YOU">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="edit-hero-subtitle">Hero Subtitle Paragraph</label>
+                  <textarea id="edit-hero-subtitle" rows="3" required placeholder="Description of frames and mirrors..."></textarea>
+                </div>
+
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label for="edit-hero-cta">CTA Button Text</label>
+                    <input type="text" id="edit-hero-cta" placeholder="e.g. Order Now">
+                  </div>
+                  <div class="form-group">
+                    <label for="edit-hero-image">Hero Showcase Circular Image URL</label>
+                    <div class="input-with-upload">
+                      <input type="text" id="edit-hero-image" placeholder="Image URL (https://...)">
+                      <label class="btn-file-upload">
+                        <i class="fa-solid fa-upload"></i> Upload
+                        <input type="file" accept="image/*" onchange="window.adminApp.uploadImage(this, 'edit-hero-image', 'hero-image-preview')">
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Hero Image Preview -->
+                <div class="image-preview-box">
+                  <span class="preview-caption">Hero Circle Preview:</span>
+                  <img id="hero-image-preview" src="" alt="Hero Preview" class="circular-preview">
+                </div>
+
+                <button type="submit" class="btn btn-yellow-sm">
+                  <i class="fa-solid fa-floppy-disk"></i> Save Hero Section
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- 4. Categories Management Form -->
+          <div class="content-card full-width-card">
+            <div class="card-header">
+              <div class="header-icon"><i class="fa-solid fa-layer-group"></i></div>
+              <h3>4. Website Categories</h3>
+            </div>
+            <div class="card-body">
+              <p class="section-desc-note">These categories populate the navigation menu links, category filter tabs, and footer links.</p>
+              <div class="categories-editor-table">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Category Key / ID</th>
+                      <th>Category Display Name</th>
+                      <th>Description</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="categories-editor-body">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+              <div class="add-category-row">
+                <button type="button" class="btn btn-outline-black-sm" onclick="window.adminApp.addNewCategoryRow()">
+                  <i class="fa-solid fa-plus"></i> Add New Category
+                </button>
+                <button type="button" class="btn btn-yellow-sm" onclick="window.adminApp.saveCategories()">
+                  <i class="fa-solid fa-floppy-disk"></i> Save Categories
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Footer & Contact Info Form -->
+          <div class="content-card full-width-card">
+            <div class="card-header">
+              <div class="header-icon"><i class="fa-solid fa-address-book"></i></div>
+              <h3>5. Footer & Contact Information</h3>
+            </div>
+            <div class="card-body">
+              <form id="form-footer" onsubmit="event.preventDefault(); window.adminApp.saveSection('footer');">
+                <div class="form-group">
+                  <label for="edit-footer-about">Footer About Text</label>
+                  <textarea id="edit-footer-about" rows="2" placeholder="About the frame store..."></textarea>
+                </div>
+
+                <div class="form-row-3">
+                  <div class="form-group">
+                    <label for="edit-footer-phone">Footer Phone Number</label>
+                    <input type="text" id="edit-footer-phone" placeholder="e.g. +92 300 1234567">
+                  </div>
+                  <div class="form-group">
+                    <label for="edit-footer-email">Footer Email Address</label>
+                    <input type="email" id="edit-footer-email" placeholder="e.g. support@framecraft.com">
+                  </div>
+                  <div class="form-group">
+                    <label for="edit-footer-address">Physical Store Address</label>
+                    <input type="text" id="edit-footer-address" placeholder="e.g. Shop #14, Mall Road, Lahore">
+                  </div>
+                </div>
+
+                <h4 class="sub-form-title">Social Media Links</h4>
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label for="edit-social-fb"><i class="fa-brands fa-facebook"></i> Facebook URL</label>
+                    <input type="url" id="edit-social-fb" placeholder="https://facebook.com/...">
+                  </div>
+                  <div class="form-group">
+                    <label for="edit-social-ig"><i class="fa-brands fa-instagram"></i> Instagram URL</label>
+                    <input type="url" id="edit-social-ig" placeholder="https://instagram.com/...">
+                  </div>
+                </div>
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label for="edit-social-yt"><i class="fa-brands fa-youtube"></i> YouTube URL</label>
+                    <input type="url" id="edit-social-yt" placeholder="https://youtube.com/...">
+                  </div>
+                  <div class="form-group">
+                    <label for="edit-social-tt"><i class="fa-brands fa-tiktok"></i> TikTok URL</label>
+                    <input type="url" id="edit-social-tt" placeholder="https://tiktok.com/...">
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-yellow-sm">
+                  <i class="fa-solid fa-floppy-disk"></i> Save Footer & Contacts
+                </button>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Tab 4: CUSTOMER ORDERS -->
+      <section id="tab-orders" class="tab-pane">
+        <div class="pane-action-bar">
+          <div class="bar-title">
+            <h2>Customer Orders</h2>
+            <p>Orders submitted by customers on the storefront. All orders are stored in <code>data.json</code>.</p>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>City / Address</th>
+                <th>Items Ordered</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="admin-orders-table-body">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Tab 5: SECURITY & CREDENTIALS -->
+      <section id="tab-security" class="tab-pane">
+        <div class="pane-action-bar">
+          <div class="bar-title">
+            <h2>Admin Security & Credentials</h2>
+            <p>Update the admin username, email, and password. Updated credentials are saved immediately to <code>data.json</code>.</p>
+          </div>
+        </div>
+
+        <div class="security-card">
+          <div class="card-header">
+            <div class="header-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <h3>Change Admin Password & Login Details</h3>
+          </div>
+          <div class="card-body">
+            <form id="change-password-form" onsubmit="event.preventDefault(); window.adminApp.handleChangePassword();">
+              <div class="form-group">
+                <label for="curr-admin-pass">Current Password *</label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-lock"></i>
+                  <input type="password" id="curr-admin-pass" required placeholder="Enter existing password (e.g. admin123)">
+                </div>
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="new-admin-user">New Admin Username</label>
+                  <div class="input-icon-wrap">
+                    <i class="fa-solid fa-user-tag"></i>
+                    <input type="text" id="new-admin-user" placeholder="Leave blank to keep current">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="new-admin-email">New Admin Email</label>
+                  <div class="input-icon-wrap">
+                    <i class="fa-regular fa-envelope"></i>
+                    <input type="email" id="new-admin-email" placeholder="Leave blank to keep current">
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="new-admin-pass">New Password *</label>
+                  <div class="input-icon-wrap">
+                    <i class="fa-solid fa-key"></i>
+                    <input type="password" id="new-admin-pass" required placeholder="Minimum 4 characters">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="confirm-admin-pass">Confirm New Password *</label>
+                  <div class="input-icon-wrap">
+                    <i class="fa-solid fa-check-double"></i>
+                    <input type="password" id="confirm-admin-pass" required placeholder="Re-type new password">
+                  </div>
+                </div>
+              </div>
+
+              <div id="password-feedback" class="auth-feedback-box"></div>
+
+              <button type="submit" class="btn btn-yellow" id="change-pass-btn">
+                <i class="fa-solid fa-lock"></i> Update Admin Password & Save
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ADD / EDIT PRODUCT MODAL -->
+  <div class="modal-backdrop" id="product-modal">
+    <div class="modal-card modal-card-lg">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-kicker">INVENTORY CONTROL</span>
+          <h3 id="product-modal-title">Add New Product</h3>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="window.adminApp.closeProductModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form id="product-form" onsubmit="event.preventDefault(); window.adminApp.handleProductSubmit();">
+          <input type="hidden" id="edit-prod-id">
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="prod-title">Product Title *</label>
+              <input type="text" id="prod-title" required placeholder="e.g. Heart Shaped LED Magic Mirror">
+            </div>
+            <div class="form-group">
+              <label for="prod-category">Category *</label>
+              <select id="prod-category" required>
+                <option value="birthday">Birthday Frame</option>
+                <option value="led-mirror">Led Magic Mirror Frames</option>
+                <option value="anniversary">Anniversary Frames</option>
+                <option value="wedding">Wedding Frame</option>
+                <option value="top-selling">Top Selling</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Price & Discount Percentage Badge Row -->
+          <div class="form-row-3">
+            <div class="form-group">
+              <label for="prod-orig-price">Original Price (Rs.) *</label>
+              <input type="number" id="prod-orig-price" required min="0" placeholder="e.g. 2999" oninput="window.adminApp.autoComputeBadge()">
+              <small class="field-hint">Greyed-out strikethrough price</small>
+            </div>
+            <div class="form-group">
+              <label for="prod-curr-price">Current Price (Rs.) *</label>
+              <input type="number" id="prod-curr-price" required min="0" placeholder="e.g. 1999" oninput="window.adminApp.autoComputeBadge()">
+              <small class="field-hint">Bold sale price</small>
+            </div>
+            <div class="form-group">
+              <label for="prod-badge">Discount Badge *</label>
+              <div class="badge-input-wrap">
+                <input type="text" id="prod-badge" required placeholder="e.g. -33%">
+                <div class="badge-preview-tag" id="badge-preview">-33%</div>
+              </div>
+              <small class="field-hint">Black circular badge text</small>
+            </div>
+          </div>
+
+          <!-- Product Image & Upload -->
+          <div class="form-group">
+            <label for="prod-image">Product Image URL or Upload *</label>
+            <div class="input-with-upload">
+              <input type="text" id="prod-image" required placeholder="Image URL (https://...) or choose file below">
+              <label class="btn-file-upload">
+                <i class="fa-solid fa-upload"></i> Upload Image
+                <input type="file" accept="image/*" onchange="window.adminApp.uploadImage(this, 'prod-image', 'prod-image-preview')">
+              </label>
+            </div>
+          </div>
+
+          <!-- Product Image Preview -->
+          <div class="image-preview-box">
+            <span class="preview-caption">Image Preview:</span>
+            <img id="prod-image-preview" src="" alt="Product Preview" class="prod-thumb-preview">
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label for="prod-desc">Product Description</label>
+            <textarea id="prod-desc" rows="3" placeholder="Explain the frame dimensions, light features, materials, and customization options..."></textarea>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group checkbox-group">
+              <label class="custom-checkbox">
+                <input type="checkbox" id="prod-top-selling">
+                <span class="checkmark"></span>
+                <span class="checkbox-label">Mark as Top Selling Frame</span>
+              </label>
+            </div>
+            <div class="form-group checkbox-group">
+              <label class="custom-checkbox">
+                <input type="checkbox" id="prod-in-stock" checked>
+                <span class="checkmark"></span>
+                <span class="checkbox-label">In Stock (Available for orders)</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="modal-form-actions">
+            <button type="button" class="btn btn-outline-black" onclick="window.adminApp.closeProductModal()">Cancel</button>
+            <button type="submit" class="btn btn-yellow" id="save-product-btn">
+              <i class="fa-solid fa-check"></i> Save Product to data.json
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Toast Container -->
+  <div id="admin-toast-container" class="toast-container"></div>
+
+  <!-- Admin Javascript Bundle -->
+  <script src="js/admin.js"></script>
+</body>
+</html>

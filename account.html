@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Account | FRAME CRAFT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      background-color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .account-header-bar {
+      background: #ffffff;
+      border-bottom: 1px solid var(--color-grey-200);
+      padding: 16px 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .account-nav-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .account-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .account-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .btn-logout {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-logout:hover {
+      background: #b91c1c;
+      color: #ffffff;
+    }
+    .account-main {
+      flex: 1;
+      padding: 40px 0 60px;
+    }
+    .account-hero-banner {
+      background: linear-gradient(135deg, #111111, #222222);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 36px 40px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-left: 8px solid var(--color-yellow);
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .account-hero-banner h1 {
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+    .account-hero-banner p {
+      color: #cbd5e1;
+      margin-top: 6px;
+      font-size: 0.95rem;
+    }
+    .account-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 28px;
+    }
+    .profile-card, .orders-card {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-grey-200);
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+    }
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--color-grey-200);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .profile-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px dashed var(--color-grey-200);
+      font-size: 0.92rem;
+    }
+    .profile-row:last-child {
+      border-bottom: none;
+    }
+    .profile-label {
+      color: var(--color-grey-500);
+      font-weight: 600;
+    }
+    .profile-val {
+      font-weight: 800;
+      color: var(--color-black);
+    }
+    .customer-badge-tag {
+      background: var(--color-yellow-light);
+      color: #854d0e;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 800;
+      display: inline-block;
+    }
+    .order-item-box {
+      border: 1px solid var(--color-grey-200);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      background: var(--color-grey-50);
+    }
+    .order-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--color-grey-200);
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+    .order-status-tag {
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-delivered { background: #dcfce7; color: #166534; }
+    .status-processing { background: #e0f2fe; color: #075985; }
+
+    @media (max-width: 860px) {
+      .account-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <aside class="top-bar">
+    <div class="container top-bar-content">
+      <div class="top-bar-left">
+        <span class="delivery-badge"><i class="fa-solid fa-truck-fast"></i></span>
+        <span class="announcement-text">Customer Portal • Free Delivery on All Customized Frames</span>
+      </div>
+      <div class="top-bar-right">
+        <span style="color: #bbb; font-size: 0.82rem;"><i class="fa-solid fa-shield-halved"></i> Customer Access Only</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Account Header -->
+  <header class="account-header-bar">
+    <div class="container account-nav-flex">
+      <a href="/" class="brand-logo">
+        <div class="logo-mark">
+          <i class="fa-solid fa-crop-simple"></i>
+        </div>
+        <div class="logo-text">
+          <span class="brand-name">FRAME CRAFT</span>
+          <span class="brand-tagline">CUSTOMER PORTAL</span>
+        </div>
+      </a>
+
+      <div class="account-actions">
+        <a href="/" class="btn btn-yellow-sm">
+          <i class="fa-solid fa-shop"></i>
+          <span>Shop Frames</span>
+        </a>
+        <button type="button" class="btn-logout" onclick="customerLogout()">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Log Out</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="account-main">
+    <div class="container">
+      
+      <!-- Welcome Hero Banner -->
+      <div class="account-hero-banner">
+        <div>
+          <span class="customer-badge-tag"><i class="fa-solid fa-circle-check"></i> Verified Customer</span>
+          <h1 id="account-welcome-name">Welcome Back!</h1>
+          <p>View your profile details and track past customized photo frame orders.</p>
+        </div>
+        <div>
+          <a href="/#products-section" class="btn btn-yellow">
+            <i class="fa-solid fa-bag-shopping"></i> Browse Catalog
+          </a>
+        </div>
+      </div>
+
+      <!-- Account Content Grid -->
+      <div class="account-grid">
+        
+        <!-- Column 1: Profile Information -->
+        <div class="profile-card">
+          <h2 class="card-title">
+            <i class="fa-regular fa-user" style="color: #ca8a04;"></i>
+            <span>Customer Profile</span>
+          </h2>
+          <div class="profile-row">
+            <span class="profile-label">Full Name:</span>
+            <span class="profile-val" id="cust-disp-name">Loading...</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-label">Email:</span>
+            <span class="profile-val" id="cust-disp-email">Loading...</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-label">Phone:</span>
+            <span class="profile-val" id="cust-disp-phone">Loading...</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-label">Delivery City:</span>
+            <span class="profile-val" id="cust-disp-city">Loading...</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-label">Address:</span>
+            <span class="profile-val" id="cust-disp-address">Loading...</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-label">Role:</span>
+            <span class="customer-badge-tag">Customer (Read-Only)</span>
+          </div>
+        </div>
+
+        <!-- Column 2: Order History -->
+        <div class="orders-card">
+          <h2 class="card-title">
+            <i class="fa-solid fa-receipt" style="color: #ca8a04;"></i>
+            <span>My Order History</span>
+          </h2>
+          
+          <div id="orders-list-container">
+            <!-- Dynamically populated -->
+            <p style="color: #64748b; font-size: 0.9rem;">Fetching your order history...</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    async function loadCustomerProfile() {
+      const token = localStorage.getItem('customer_token');
+      if (!token) {
+        window.location.href = '/customer-login';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/customer/profile', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          localStorage.removeItem('customer_token');
+          window.location.href = '/customer-login';
+          return;
+        }
+
+        const customer = data.customer;
+        document.getElementById('account-welcome-name').textContent = `Welcome, ${customer.name}!`;
+        document.getElementById('cust-disp-name').textContent = customer.name;
+        document.getElementById('cust-disp-email').textContent = customer.email;
+        document.getElementById('cust-disp-phone').textContent = customer.phone || 'Not provided';
+        document.getElementById('cust-disp-city').textContent = customer.city || 'Standard Nationwide';
+        document.getElementById('cust-disp-address').textContent = customer.address || 'Saved on checkout';
+
+        // Render orders
+        renderCustomerOrders(data.orders || []);
+
+      } catch (err) {
+        console.error('Profile load error:', err);
+      }
+    }
+
+    function renderCustomerOrders(orders) {
+      const container = document.getElementById('orders-list-container');
+      if (!orders.length) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px 20px; background: #f8fafc; border-radius: 8px;">
+            <i class="fa-solid fa-box-open" style="font-size: 2.5rem; color: #94a3b8; margin-bottom: 12px;"></i>
+            <h4 style="font-size: 1.1rem; font-weight: 800;">No past orders yet</h4>
+            <p style="color: #64748b; font-size: 0.88rem; margin: 6px 0 16px;">When you place customized frame orders on our shop, they will automatically appear here!</p>
+            <a href="/#products-section" class="btn btn-yellow-sm">Browse Customized Frames</a>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = orders.map(order => {
+        const dateStr = new Date(order.orderDate).toLocaleDateString('en-PK', { dateStyle: 'medium' });
+        const itemsList = (order.items || []).map(i => `${i.quantity}x ${i.title}`).join(', ');
+        
+        let statusClass = 'status-pending';
+        if (order.status === 'Delivered') statusClass = 'status-delivered';
+        if (order.status === 'Processing') statusClass = 'status-processing';
+
+        return `
+          <div class="order-item-box">
+            <div class="order-item-header">
+              <div>
+                <strong style="font-size: 1rem; color: #111;">Order #${order.id}</strong>
+                <span style="color: #64748b; font-size: 0.8rem; margin-left: 8px;">• Placed on ${dateStr}</span>
+              </div>
+              <span class="order-status-tag ${statusClass}">${order.status || 'Pending'}</span>
+            </div>
+            <div style="font-size: 0.9rem; color: #333; margin-bottom: 8px;">
+              <strong>Items:</strong> ${itemsList}
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem;">
+              <span>Payment: <strong>${order.paymentMethod || 'Cash on Delivery (COD)'}</strong></span>
+              <span style="font-size: 1.1rem; font-weight: 900; color: #111;">Rs. ${Number(order.totalAmount).toLocaleString('en-PK')}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function customerLogout() {
+      localStorage.removeItem('customer_token');
+      localStorage.removeItem('customer_info');
+      window.location.href = '/customer-login';
+    }
+
+    document.addEventListener('DOMContentLoaded', loadCustomerProfile);
+  </script>
+</body>
+</html>
