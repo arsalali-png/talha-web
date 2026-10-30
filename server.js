@@ -757,15 +757,20 @@ app.use((err, req, res, next) => {
   res.status(500).json({ success: false, message: err.message || 'Internal server error' });
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`===============================================`);
-  console.log(`  FRAME CRAFT SERVER - SEPARATED ROLES ACTIVE`);
-  console.log(`  Storefront:        http://localhost:${PORT}`);
-  console.log(`  Customer Login:    http://localhost:${PORT}/customer-login`);
-  console.log(`  Customer Portal:   http://localhost:${PORT}/account`);
-  console.log(`  Admin Login:       http://localhost:${PORT}/admin-login`);
-  console.log(`  Admin Dashboard:   http://localhost:${PORT}/admin-dashboard`);
-  console.log(`  Database File:     ${DATA_FILE}`);
-  console.log(`===============================================`);
-});
+// Start Server (Compatible with local and Vercel serverless)
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`===============================================`);
+    console.log(`  FRAME CRAFT SERVER - SEPARATED ROLES ACTIVE`);
+    console.log(`  Storefront:        http://localhost:${PORT}`);
+    console.log(`  Customer Login:    http://localhost:${PORT}/customer-login`);
+    console.log(`  Customer Portal:   http://localhost:${PORT}/account`);
+    console.log(`  Admin Login:       http://localhost:${PORT}/admin-login`);
+    console.log(`  Admin Dashboard:   http://localhost:${PORT}/admin-dashboard`);
+    console.log(`  Database File:     ${DATA_FILE}`);
+    console.log(`===============================================`);
+  });
+}
+
+// Export app for Vercel serverless deployment
+module.exports = app;
